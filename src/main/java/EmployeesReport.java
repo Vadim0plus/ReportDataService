@@ -14,7 +14,7 @@ public class EmployeesReport extends AbstractReporter{
             "<th>Notes</th>\n" +
             "</tr>\n";
 
-    final private String end_table = "</table>";
+    final private String end_table = "</table>\n";
 
     private String tag_td_wrapper(String str) {
         return "<td>"+str+"</td>\n";
