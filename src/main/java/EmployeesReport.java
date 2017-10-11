@@ -1,24 +1,8 @@
 import java.util.List;
 
-public class EmployeesReport extends AbstractReporter{
+public class EmployeesReport extends FormatAbstractReporter {
 
     DataDAO dataDAO;
-
-    final private String begin_table = "" +
-            "<table>\n" +
-            "<tr>\n" +
-            "<th>Last name</th>\n" +
-            "<th>First name</th>\n" +
-            "<th>Birth Date</th>\n" +
-           // "<th>Photo</th>\n" +
-            "<th>Notes</th>\n" +
-            "</tr>\n";
-
-    final private String end_table = "</table>\n";
-
-    private String tag_td_wrapper(String str) {
-        return "<td>"+str+"</td>\n";
-    }
 
     public EmployeesReport() {
         this.serviceType = "EmployeesReport";
@@ -33,24 +17,30 @@ public class EmployeesReport extends AbstractReporter{
         this.dataDAO = dataDAO;
     }
 
-    @Override
-    protected void write(StringBuffer response) {
+    protected TableModel tableFromList(List<Employee> list) {
+        TableModel table = new TableModel();
+        table.addColumn("Last Name");
+        table.addColumn("First Name");
+        table.addColumn("Birth Date");
+        table.addColumn("Notes");
 
-        List<Employee> employeeList = dataDAO.getAllEmployees();
-
-        response.append("<h3>Employees</h3>\n");
-        response.append(begin_table);
-
-        employeeList.stream().forEach( (employee) -> {
-            response.append("<tr>\n");
-            response.append(tag_td_wrapper(employee.getLastName()));
-            response.append(tag_td_wrapper(employee.getFirstName()));
-            response.append(tag_td_wrapper(employee.getBirthDate()));
-           // response.append(tag_td_wrapper(employee.getPhotoID())); // Don't implement
-            response.append(tag_td_wrapper(employee.getNotes().toString()));
-            response.append("</tr>\n");
+        list.stream().forEach( (employee) -> {
+            String[] row = new String[4];
+            row[0] = employee.getLastName();
+            row[1] = employee.getFirstName();
+            row[2] = employee.getBirthDate();
+            row[3] = employee.getNotes().toString();
+            table.addRow(row);
         });
 
-        response.append(end_table);
+        return table;
+    }
+
+
+    @Override
+    protected void write(StringBuffer response) {
+        List<Employee> employeeList = dataDAO.getAllEmployees();
+        TableModel table = tableFromList(employeeList);
+        response.append(fromTableToText(table));
     }
 }

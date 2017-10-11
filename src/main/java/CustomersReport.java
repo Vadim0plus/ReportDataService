@@ -1,26 +1,9 @@
 import java.util.List;
 import java.util.stream.Stream;
 
-public class CustomersReport extends AbstractReporter {
+public class CustomersReport extends FormatAbstractReporter {
 
     DataDAO dataDAO;
-
-    final String begin_table = "" +
-            "<table>\n" +
-            "<tr>\n" +
-            "<th>Customer Name</th>\n" +
-            "<th>Contact name</th>\n" +
-            "<th>Address</th>\n" +
-            "<th>City</th>\n" +
-            "<th>Postal Code</th>\n" +
-            "<th>Country</th>\n" +
-            "</tr>\n";
-
-    final String end_table = "</table>";
-
-    private String tag_td_wrapper(String str) {
-        return "<td>"+str+"</td>\n";
-    }
 
     public CustomersReport() {
         this.serviceType = "CustomersReport";
@@ -35,25 +18,33 @@ public class CustomersReport extends AbstractReporter {
         this.dataDAO = dataDAO;
     }
 
-    @Override
-    protected void write(StringBuffer response) {
+    protected TableModel tableFromList(List<Customer> list) {
+        TableModel table = new TableModel();
+        table.addColumn("Customer Name");
+        table.addColumn("Contact Name");
+        table.addColumn("Address");
+        table.addColumn("City");
+        table.addColumn("Postal Code");
+        table.addColumn("Country");
 
-        List<Customer> customerList = dataDAO.getAllCustomers();
-
-        response.append("<h3>Customers</h3>\n");
-        response.append(begin_table);
-
-        customerList.stream().forEach( (customer) -> {
-            response.append("<tr>\n");
-            response.append(tag_td_wrapper(customer.getCustomerName()));
-            response.append(tag_td_wrapper(customer.getContactName()));
-            response.append(tag_td_wrapper(customer.getAddress()));
-            response.append(tag_td_wrapper(customer.getCity()));
-            response.append(tag_td_wrapper(customer.getPostalCode()));
-            response.append(tag_td_wrapper(customer.getCountry()));
-            response.append("</tr>\n");
+        list.stream().forEach( (customer) -> {
+            String[] row = new String[6];
+            row[0] = customer.getCustomerName();
+            row[1] = customer.getContactName();
+            row[2] = customer.getAddress();
+            row[3] = customer.getCity();
+            row[4] = customer.getPostalCode();
+            row[5] = customer.getCountry();
+            table.addRow(row);
         });
 
-        response.append(end_table);
+        return table;
+    }
+
+    @Override
+    protected void write(StringBuffer response) {
+        List<Customer> customerList = dataDAO.getAllCustomers();
+        response.append("<h3>Customers</h3>\n");
+        response.append(fromTableToHtml(tableFromList(customerList)));
     }
 }

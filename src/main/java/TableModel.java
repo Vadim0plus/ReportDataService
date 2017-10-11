@@ -5,16 +5,16 @@ import java.util.List;
 
 public class TableModel {
     private List<String> columnNames;
-    private List<Object[]> data;
+    private List<String[]> data;
 
     public TableModel() {
-        data = new ArrayList<Object[]>();
+        data = new ArrayList<String[]>();
         columnNames = new ArrayList<String>();
     }
 
-    public TableModel(String[] columnNames, Object[][] data) {
+    public TableModel(String[] columnNames, String[][] data) {
         this(columnNames.length,data.length);
-        for(Object[] obj : data)
+        for(String[] obj : data)
             this.data.add(obj);
         this.columnNames.addAll(Arrays.asList(columnNames));
     }
@@ -25,7 +25,7 @@ public class TableModel {
     }
 
     public TableModel(int rowCount, int columnCount) {
-        data = new ArrayList<Object[]>(rowCount);
+        data = new ArrayList<String[]>(rowCount);
         columnNames = new ArrayList<String>(columnCount);
     }
 
@@ -33,21 +33,21 @@ public class TableModel {
         insertColumn(columnName, this.getColumnCount() - 1);
     }
 
-    public void addColumn(String columnName, Object[] columnData) {
+    public void addColumn(String columnName, String[] columnData) {
         insertColumn(columnName, getColumnCount() - 1,columnData);
     }
 
     public void insertColumn(String columnName, int pos) {
-        Object[] newData = new Object[getColumnCount() + 1];
+        String[] newData = new String[getColumnCount() + 1];
         Arrays.fill(newData,null);
         insertColumn(columnName,pos,newData);
     }
 
-    public void insertColumn(String columnName, int pos, Object[] columnData) {
+    public void insertColumn(String columnName, int pos, String[] columnData) {
         this.columnNames.add(pos,columnName);
-        Iterator<Object[]> iter = this.data.iterator();
+        Iterator<String[]> iter = this.data.iterator();
         for(int i = 0; i < this.data.size(); i++) {
-            Object[] newArray = new Object[getColumnCount() + 1];
+            String[] newArray = new String[getColumnCount() + 1];
             System.arraycopy(this.data.get(i),0,newArray,0,pos+1);
             newArray[pos+1] = columnData[i];
             System.arraycopy(this.data.get(i),pos+1,newArray,pos+2,getColumnCount()-pos-1);
@@ -68,25 +68,29 @@ public class TableModel {
         return columnNames.get(column);
     }
 
-    public Object getValueAt(int row,int column) {
-        Object[] rowData = data.get(row);
+    public String[] getColumnNames() {
+        return (String[])this.columnNames.toArray().clone();
+    }
+
+    public String getValueAt(int row,int column) {
+        String[] rowData = data.get(row);
         return rowData[column];
     }
 
-    public void setValueAt(Object value, int row, int column) {
-        Object[] rowData = data.get(row);
+    public void setValueAt(String value, int row, int column) {
+        String[] rowData = data.get(row);
         rowData[column] = value;
     }
 
-    public Object[] getRow(int row) {
+    public String[] getRow(int row) {
         return data.get(row).clone();
     }
 
-    public void addRow(Object[] data) {
+    public void addRow(String[] data) {
         insertRow(getRowCount()-1,data);
     }
 
-    public void insertRow(int row, Object data[]) {
+    public void insertRow(int row, String data[]) {
         this.data.add(row,data);
     }
 
@@ -97,17 +101,10 @@ public class TableModel {
     public void moveRow(int start, int end, int to) {
     }
 
-    public void replaceRow(int pos, Object[] data) {
+    public void replaceRow(int pos, String[] data) {
         this.data.set(pos,data);
     }
 
-    public void setColumnClass() {
-    }
-
-    public Class<?> getColumnClass(int col) {
-        Object row = this.data.get(0);
-        return row.getClass();
-    }
 
     @Override
     public String toString() {
